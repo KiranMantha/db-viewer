@@ -1,0 +1,126 @@
+{
+  "name": "db-viewer",
+  "displayName": "DB Viewer",
+  "description": "test",
+  "publisher": "Kiran Mantha",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "files": [
+    "dist",
+    "resources"
+  ],
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "icon": "resources/db.png",
+  "author": "KiranMantha",
+  "bugs": {
+    "url": "https://github.com/KiranMantha/db-viewer-vscode/issues"
+  },
+  "homepage": "https://github.com/KiranMantha/db-viewer-vscode#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KiranMantha/db-viewer-vscode.git"
+  },
+  "license": "SEE LICENSE IN LICENSE.md",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "db-viewer-sidebar-view",
+          "title": "DB Viewer",
+          "icon": "resources/db.png"
+        }
+      ],
+      "panel": [
+        {
+          "id": "db-viewer-query-result",
+          "title": "Query Results",
+          "icon": ""
+        }
+      ]
+    },
+    "views": {
+      "db-viewer-sidebar-view": [
+        {
+          "id": "dbviewer-sidebar",
+          "name": "DBViewer",
+          "icon": "resources/db.svg",
+          "type": "webview",
+          "contextualTitle": "DBViewer"
+        },
+        {
+          "id": "dbviewer-treeview",
+          "type": "tree",
+          "name": "Database Tables"
+        }
+      ],
+      "db-viewer-query-result": [
+        {
+          "id": "queryresult-view",
+          "name": "Query Results",
+          "type": "webview",
+          "contextualTitle": "Query Results"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "db-viewer.helloWorld",
+        "title": "Hello World DB Viewer"
+      },
+      {
+        "command": "db-viewer.queryTable",
+        "title": "Query Table",
+        "icon": {
+          "light": "resources/play-icon-dark.svg",
+          "dark": "resources/play-icon-light.svg"
+        }
+      }
+    ],
+    "menus": {
+      "view/item/context": [
+        {
+          "command": "db-viewer.queryTable",
+          "when": "view == dbviewer-treeview",
+          "group": "inline"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "yarn run package",
+    "compile": "webpack && node esbuild.config.js",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map && node esbuild.config.js",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "yarn run compile-tests && yarn run compile && yarn run lint",
+    "lint": "eslint src",
+    "test": "vscode-test",
+    "build": "vsce package"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@types/vscode": "^1.96.0",
+    "@typescript-eslint/eslint-plugin": "^8.17.0",
+    "@typescript-eslint/parser": "^8.17.0",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1",
+    "better-sqlite3": "^11.7.0",
+    "esbuild": "^0.24.0",
+    "eslint": "^9.16.0",
+    "preact": "^10.25.3",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.7.2",
+    "webpack": "^5.95.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {}
+}
