@@ -99,7 +99,7 @@ textarea::placeholder {
 table {
   width: 100%;
   table-layout: fixed;
-  border-collapse: seperate;
+  border-collapse: separate;
   border-spacing: 0px;
   margin: 16px 0;
   font-family: var(--vscode-font-family, sans-serif);

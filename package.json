@@ -1,5 +1,5 @@
 {
-  "name": "db-viewer-vscode",
+  "name": "db-viewer-vscode-file",
   "displayName": "DB Viewer",
   "description": "test",
   "publisher": "Kiran Mantha",
@@ -29,40 +29,59 @@
   "assets": [
     "resources"
   ],
-  "activationEvents": [],
+  "extensionKind": [
+    "workspace",
+    "ui"
+  ],
+  "activationEvents": [
+    "onCommand:db-viewer.openDatabaseFile",
+    "onLanguage:sql",
+    "onFileSystem:.sqlite",
+    "onFileSystem:.sqlite3",
+    "onFileSystem:.db"
+  ],
   "contributes": {
-    "viewsContainers": {
-      "activitybar": [
-        {
-          "id": "db-viewer-sidebar-view",
-          "title": "DB Viewer",
-          "icon": "resources/db.svg"
+    "languages": [
+      {
+        "id": "sqlite",
+        "extensions": [
+          ".db",
+          ".sqlite",
+          ".sqlite3"
+        ],
+        "aliases": [
+          "SQLite",
+          "sqlite"
+        ],
+        "mimetypes": [
+          "application/x-sqlite3"
+        ]
+      }
+    ],
+    "configuration": {
+      "title": "SQLite Viewer",
+      "properties": {
+        "sqliteViewer.maxFileSize": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 4000,
+          "exclusiveMinimum": false,
+          "default": 200,
+          "markdownDescription": "The maximum file size in MB the extension will attempt to load. Set to 0 to disable the limit. The internal limit is 4GB, but platform limits may apply earlier.\n\n__Warning__: Opening large files may cause poor performance, freezes, and system-wide memory pressure."
         }
-      ],
+      }
+    },
+    "viewsContainers": {
       "panel": [
         {
-          "id": "db-viewer-query-result",
-          "title": "Query Results",
+          "id": "db-viewer-open-file",
+          "title": "DB Viewer",
           "icon": "resources/db.svg"
         }
       ]
     },
     "views": {
-      "db-viewer-sidebar-view": [
-        {
-          "id": "dbviewer-sidebar",
-          "name": "DBViewer",
-          "icon": "resources/db.svg",
-          "type": "webview",
-          "contextualTitle": "DBViewer"
-        },
-        {
-          "id": "dbviewer-treeview",
-          "type": "tree",
-          "name": "Database Tables"
-        }
-      ],
-      "db-viewer-query-result": [
+      "db-viewer-open-file": [
         {
           "id": "queryresult-view",
           "name": "Query Results",
@@ -73,24 +92,21 @@
     },
     "commands": [
       {
-        "command": "db-viewer.helloWorld",
-        "title": "Hello World DB Viewer"
+        "command": "db-viewer.addFileNestingPatterns",
+        "title": "Add SQLite File Nesting Patterns",
+        "category": "DB Viewer"
       },
       {
-        "command": "db-viewer.queryTable",
-        "title": "Query Table",
-        "icon": {
-          "light": "resources/play-icon-dark.svg",
-          "dark": "resources/play-icon-light.svg"
-        }
+        "command": "db-viewer.openDatabaseFile",
+        "title": "Open Database File",
+        "category": "DB Viewer"
       }
     ],
     "menus": {
-      "view/item/context": [
+      "explorer/context": [
         {
-          "command": "db-viewer.queryTable",
-          "when": "view == dbviewer-treeview",
-          "group": "inline"
+          "command": "db-viewer.openDatabaseFile",
+          "when": "resourceExtname == .db || resourceExtname == .sqlite || resourceExtname == .sqlite3"
         }
       ]
     }

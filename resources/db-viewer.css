@@ -1,0 +1,55 @@
+body {
+  height: 100vh;
+  margin: 0;
+}
+body #app {
+  height: 100%;
+  display: flex;
+  gap: 16px;
+  margin: 0;
+}
+body #app aside {
+  width: 30%;
+  border-right: 1px solid #ccc;
+  padding-right: 16px;
+}
+body #app main {
+  flex: 1;
+}
+body #app aside h2 {
+  font-weight: bold;
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+}
+body #app aside ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+body #app aside > ul li {
+  list-style: none;
+  cursor: pointer;
+}
+body #app aside > ul > li {
+  margin: 16px 0;
+}
+body #app aside > ul > li > ul {
+  margin-left: 22px;
+}
+body #app aside > ul > li > ul > li {
+  margin: 5px 0;
+}
+.toggle-tree {
+  cursor: pointer;
+  user-select: none;
+  margin-right: 5px;
+}
+.tree-name {
+  font-weight: bold;
+  text-transform: capitalize;
+}
+.leaf-name {
+  text-transform: capitalize;
+  margin-right: 5px;
+}

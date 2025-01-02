@@ -3,3 +3,8 @@ declare module globalThis {
     postMessage: (data: { command: string } & Record<string, any>) => void;
   };
 }
+
+declare module '*.scss' {
+  const content: any;
+  export default content;
+}

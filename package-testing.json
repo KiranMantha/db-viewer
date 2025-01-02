@@ -1,0 +1,82 @@
+{
+  "customEditors": [
+    {
+      "viewType": "db-viewer.view",
+      "displayName": "DB Viewer",
+      "selector": [
+        {
+          "filenamePattern": "*.sqlite"
+        },
+        {
+          "filenamePattern": "*.sqlite3"
+        },
+        {
+          "filenamePattern": "*.db"
+        }
+      ]
+    }
+  ],
+  "viewsContainers": {
+    "activitybar": [
+      {
+        "id": "db-viewer-sidebar-view",
+        "title": "DB Viewer",
+        "icon": "resources/db.svg"
+      }
+    ],
+    "panel": [
+      {
+        "id": "db-viewer-query-result",
+        "title": "Query Results",
+        "icon": "resources/db.svg"
+      }
+    ]
+  },
+  "views": {
+    "db-viewer-sidebar-view": [
+      {
+        "id": "dbviewer-sidebar",
+        "name": "DBViewer",
+        "icon": "resources/db.svg",
+        "type": "webview",
+        "contextualTitle": "DBViewer"
+      },
+      {
+        "id": "dbviewer-treeview",
+        "type": "tree",
+        "name": "Database Tables"
+      }
+    ],
+    "db-viewer-query-result": [
+      {
+        "id": "queryresult-view",
+        "name": "Query Results",
+        "type": "webview",
+        "contextualTitle": "Query Results"
+      }
+    ]
+  },
+  "commands": [
+    {
+      "command": "db-viewer.helloWorld",
+      "title": "Hello World DB Viewer"
+    },
+    {
+      "command": "db-viewer.queryTable",
+      "title": "Query Table",
+      "icon": {
+        "light": "resources/play-icon-dark.svg",
+        "dark": "resources/play-icon-light.svg"
+      }
+    }
+  ],
+  "menus": {
+    "view/item/context": [
+      {
+        "command": "db-viewer.queryTable",
+        "when": "view == dbviewer-treeview",
+        "group": "inline"
+      }
+    ]
+  }
+}
