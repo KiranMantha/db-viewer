@@ -101,7 +101,6 @@ table {
   table-layout: fixed;
   border-collapse: separate;
   border-spacing: 0px;
-  margin: 16px 0;
   font-family: var(--vscode-font-family, sans-serif);
   font-size: var(--vscode-font-size, 14px);
   color: var(--vscode-editor-foreground, #d4d4d4);

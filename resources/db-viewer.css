@@ -7,18 +7,21 @@ body #app {
   display: flex;
   gap: 16px;
   margin: 0;
+  border-top: 1px solid #666;
 }
 body #app aside {
   width: 30%;
-  border-right: 1px solid #ccc;
+  border-right: 1px solid #666;
   padding-right: 16px;
+  padding-top: 16px;
 }
 body #app main {
   flex: 1;
+  padding: 16px 0;
 }
 body #app aside h2 {
   font-weight: bold;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid #666;
   margin-bottom: 16px;
   padding-bottom: 16px;
 }
