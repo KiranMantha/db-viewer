@@ -14,7 +14,6 @@
     "dist",
     "resources"
   ],
-  "activationEvents": [],
   "main": "./dist/extension.js",
   "icon": "resources/db.png",
   "author": "KiranMantha",
@@ -30,6 +29,7 @@
   "assets": [
     "resources"
   ],
+  "activationEvents": [],
   "contributes": {
     "viewsContainers": {
       "activitybar": [

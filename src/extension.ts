@@ -10,21 +10,9 @@ export function activate(context: vscode.ExtensionContext) {
   // This line of code will only be executed once when your extension is activated
   console.log('Congratulations, your extension "db-viewer" is now active!');
 
-  // The command has been defined in the package.json file
-  // Now provide the implementation of the command with registerCommand
-  // The commandId parameter must match the command field in package.json
-  const disposable = vscode.commands.registerCommand('db-viewer.helloWorld', () => {
-    // The code you place here will be executed every time your command is executed
-    // Display a message box to the user
-    vscode.window.showInformationMessage('Hello World from DB Viewer!');
-  });
-
-  context.subscriptions.push(disposable);
-
   const dbTreeProvider = new DBTreeProvider(context.extensionUri);
   const sidebarProvider = new SidebarProvider(context, dbTreeProvider);
-  const queryResultProvider = new WebviewProvider(context, 'queryresult-view', 'Query Results');
-
+  const queryResultProvider = new WebviewProvider(context, 'Query Results');
   context.subscriptions.push(vscode.window.registerTreeDataProvider(DBTreeProvider.viewId, dbTreeProvider));
   context.subscriptions.push(vscode.window.registerWebviewViewProvider(SidebarProvider.viewId, sidebarProvider));
   context.subscriptions.push(
