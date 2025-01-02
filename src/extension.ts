@@ -21,7 +21,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(disposable);
 
-  const dbTreeProvider = new DBTreeProvider();
+  const dbTreeProvider = new DBTreeProvider(context.extensionUri);
   const sidebarProvider = new SidebarProvider(context, dbTreeProvider);
   const queryResultProvider = new WebviewProvider(context, 'queryresult-view', 'Query Results');
 

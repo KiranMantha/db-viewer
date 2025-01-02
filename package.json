@@ -1,9 +1,9 @@
 {
-  "name": "db-viewer",
+  "name": "db-viewer-vscode",
   "displayName": "DB Viewer",
   "description": "test",
   "publisher": "Kiran Mantha",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "engines": {
     "vscode": "^1.96.0"
   },
@@ -19,28 +19,31 @@
   "icon": "resources/db.png",
   "author": "KiranMantha",
   "bugs": {
-    "url": "https://github.com/KiranMantha/db-viewer-vscode/issues"
+    "url": "https://github.com/KiranMantha/db-viewer/issues"
   },
-  "homepage": "https://github.com/KiranMantha/db-viewer-vscode#readme",
+  "homepage": "https://github.com/KiranMantha/db-viewer#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/KiranMantha/db-viewer-vscode.git"
+    "url": "git+https://github.com/KiranMantha/db-viewer.git"
   },
   "license": "SEE LICENSE IN LICENSE.md",
+  "assets": [
+    "resources"
+  ],
   "contributes": {
     "viewsContainers": {
       "activitybar": [
         {
           "id": "db-viewer-sidebar-view",
           "title": "DB Viewer",
-          "icon": "resources/db.png"
+          "icon": "resources/db.svg"
         }
       ],
       "panel": [
         {
           "id": "db-viewer-query-result",
           "title": "Query Results",
-          "icon": ""
+          "icon": "resources/db.svg"
         }
       ]
     },

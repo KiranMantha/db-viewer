@@ -19,5 +19,6 @@
   "typescript.tsc.autoDetect": "off",
   "[svg]": {
     "editor.defaultFormatter": "jock.svg"
-  }
+  },
+  "svg.preview.background": "editor"
 }

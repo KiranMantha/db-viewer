@@ -30,6 +30,8 @@ export class DBTreeProvider implements vscode.TreeDataProvider<DBTreeItem> {
 
   private tables: DBTreeItem[] = []; // Store the tables and columns here
 
+  constructor(readonly extensionUri: vscode.Uri) {}
+
   setDatabaseData(tables: DBTreeItem[]) {
     this.tables = tables; // Update the tree data
     this.refresh(); // Notify the tree view to refresh
@@ -53,9 +55,9 @@ export class DBTreeProvider implements vscode.TreeDataProvider<DBTreeItem> {
     return this.tables;
   }
 
-  private _getIcon(contextValue?: string): vscode.ThemeIcon | undefined {
+  private _getIcon(contextValue: string): vscode.Uri | vscode.ThemeIcon | undefined {
     if (contextValue === 'table') {
-      return new vscode.ThemeIcon('database');
+      return vscode.Uri.joinPath(this.extensionUri, 'resources', 'table.svg');
     }
     if (contextValue === 'column') {
       return new vscode.ThemeIcon('symbol-field');

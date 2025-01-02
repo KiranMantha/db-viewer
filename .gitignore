@@ -14,4 +14,6 @@ lerna-debug.log*
 .DS_Store
 .codegpt
 out
-dist
+
+# local package
+db-viewer-*.vsix
