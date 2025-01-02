@@ -394,6 +394,7 @@
     const [tableInfo, setTableInfo] = h2();
     const headers = tableInfo?.columns || [];
     const rows = tableInfo?.rows || [];
+    const selectQuery = tableInfo?.selectQuery || "";
     const toggleNode = (nodeName) => {
       setExpandedNodes((prev) => {
         const newExpandedNodes = new Set(prev);
@@ -412,10 +413,15 @@
     const getRecordsFromTable = (tableName) => {
       vscodeApi.postMessage({ command: "QUERY_TABLE", tableName });
     };
-    const onFormSubmit = (e3) => {
+    const handleUpdateRecord = (e3) => {
       e3.preventDefault();
       const formData = new FormData(e3.currentTarget);
       console.log(JSON.stringify(Object.fromEntries(formData), null, 4));
+    };
+    const handleSelectQuery = (e3) => {
+      e3.preventDefault();
+      const formData = new FormData(e3.currentTarget);
+      vscodeApi.postMessage({ command: "QUERY_TABLE", selectQuery: formData.get("selectQuery") });
     };
     const handleMessage = (event) => {
       console.log("tsx event inside component", event);
@@ -432,7 +438,14 @@
       vscodeApi.postMessage({ command: "QUERY_DATABASE" });
       return () => window.removeEventListener("message", handleMessage);
     }, []);
-    return /* @__PURE__ */ g(k, null, /* @__PURE__ */ g("aside", null, /* @__PURE__ */ g("h2", null, "Tables"), /* @__PURE__ */ g("ul", null, tables.map((table) => renderTreeNode(table)))), /* @__PURE__ */ g("main", null, tableInfo ? /* @__PURE__ */ g("table", null, /* @__PURE__ */ g("thead", null, /* @__PURE__ */ g("tr", null, headers.map((header) => /* @__PURE__ */ g("th", { key: header }, header)), /* @__PURE__ */ g("th", null))), /* @__PURE__ */ g("tbody", null, rows.map((row, index) => /* @__PURE__ */ g("tr", { key: index }, headers.map((header, headerIndex) => /* @__PURE__ */ g("td", { key: header }, headerIndex === 0 ? /* @__PURE__ */ g(k, null, /* @__PURE__ */ g("form", { method: "GET", id: `inline-form-${row[headers[0]] ?? ""}`, onSubmit: onFormSubmit }), /* @__PURE__ */ g(
+    return /* @__PURE__ */ g(k, null, /* @__PURE__ */ g("aside", null, /* @__PURE__ */ g("h2", null, "Tables"), /* @__PURE__ */ g("ul", null, tables.map((table) => renderTreeNode(table)))), /* @__PURE__ */ g("main", null, tableInfo ? /* @__PURE__ */ g(k, null, /* @__PURE__ */ g("form", { method: "GET", id: "select-query-form", onSubmit: handleSelectQuery }, /* @__PURE__ */ g("input", { type: "text", name: "selectQuery", defaultValue: selectQuery }), /* @__PURE__ */ g("button", { type: "submit" }, "Send Query")), /* @__PURE__ */ g("table", null, /* @__PURE__ */ g("thead", null, /* @__PURE__ */ g("tr", null, headers.map((header) => /* @__PURE__ */ g("th", { key: header }, header)), /* @__PURE__ */ g("th", null))), /* @__PURE__ */ g("tbody", null, rows.map((row, index) => /* @__PURE__ */ g("tr", { key: index }, headers.map((header, headerIndex) => /* @__PURE__ */ g("td", { key: header }, headerIndex === 0 ? /* @__PURE__ */ g(k, null, /* @__PURE__ */ g(
+      "form",
+      {
+        method: "GET",
+        id: `inline-form-${row[headers[0]] ?? ""}`,
+        onSubmit: handleUpdateRecord
+      }
+    ), /* @__PURE__ */ g(
       "input",
       {
         type: "hidden",
@@ -465,7 +478,7 @@
           d: "M13.353 1.146l1.5 1.5L15 3v11.5l-.5.5h-13l-.5-.5v-13l.5-.5H13l.353.146zM2 2v12h12V3.208L12.793 2H11v4H4V2H2zm6 0v3h2V2H8z"
         }
       )
-    ))))))) : null));
+    )))))))) : null));
   };
   D(/* @__PURE__ */ g(DBViewer, null), document.getElementById("app"));
 })();

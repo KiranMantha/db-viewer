@@ -67,7 +67,7 @@ export class SQLiteCustomEditorProvider implements vscode.CustomReadonlyEditorPr
         break;
       }
       case 'QUERY_TABLE': {
-        this._queryTable(args.tableName);
+        this._queryTable(args.tableName || '', args.selectQuery || '');
         break;
       }
     }
@@ -79,19 +79,49 @@ export class SQLiteCustomEditorProvider implements vscode.CustomReadonlyEditorPr
     this._panel?.webview.postMessage({ command: 'DISPLAY_TABLES', data: { tables } });
   }
 
-  private async _queryTable(tableName: string) {
-    const columnInfoQuery = `PRAGMA table_info(${tableName});`;
-    const selectQuery = `SELECT * FROM ${tableName} LIMIT 10;`;
+  private _getQueryMetadata(query: string) {
+    // Regex to match SELECT columns or *
+    const regex = /(?<=select\s+)(\*|[\w,\s]+)\s+from\s+(\w+)(?=\s*(?:as\s+)?\w*)/i;
+
+    // Match the query
+    const match = regex.exec(query);
+
+    // If there's no match, return null (or an empty object if you prefer)
+    if (!match) {
+      return { tableName: '', columns: [] };
+    }
+
+    // Extract table name
+    const tableName = match[2];
+
+    // If the columns part is "*", return empty array for columns
+    const columns = match[1] === '*' ? [] : match[1].split(/\s*,\s*/); // Split by comma and optional spaces
+
+    // Return the result in the desired format
+    return {
+      tableName,
+      columns
+    };
+  }
+
+  private async _queryTable(tableName: string, query: string) {
+    const selectQuery = tableName ? `SELECT * FROM ${tableName} LIMIT 10` : query;
+    const metadata = this._getQueryMetadata(selectQuery);
+    const columnInfoQuery = `PRAGMA table_info(${metadata.tableName})`;
+    let columns: string[] = metadata.columns;
+
     try {
       console.log('select query', selectQuery);
-      const columnInfoResult = await this._sqliteClient?.executeCommand(columnInfoQuery);
+      if (!columns.length) {
+        const columnInfoResult = await this._sqliteClient?.executeCommand(columnInfoQuery);
 
-      console.log('columnInfoResult', columnInfoResult);
-      // Parse column info to get column names
-      const columns: string[] = (columnInfoResult || '')
-        .split('\n')
-        .filter(Boolean)
-        .map(line => line.split('|')[1]); // Assuming 2nd field is the column name
+        console.log('columnInfoResult', columnInfoResult);
+        // Parse column info to get column names
+        columns = (columnInfoResult || '')
+          .split('\n')
+          .filter(Boolean)
+          .map(line => line.split('|')[1]); // Assuming 2nd field is the column name
+      }
       // read actual data from select query
       const queryResult = await this._sqliteClient?.executeCommand(selectQuery);
       // Parse rows into an array of objects
@@ -105,7 +135,10 @@ export class SQLiteCustomEditorProvider implements vscode.CustomReadonlyEditorPr
             return obj;
           }, {} as Record<string, string>);
         });
-      this._panel?.webview.postMessage({ command: 'DISPLAY_QUERY_RESULTS', data: { tableName, columns, rows } });
+      this._panel?.webview.postMessage({
+        command: 'DISPLAY_QUERY_RESULTS',
+        data: { tableName, columns, rows, selectQuery }
+      });
     } catch (error) {
       vscode.window.showErrorMessage(`Failed to query table "${tableName}": ${(error as { message: string }).message}`);
     }

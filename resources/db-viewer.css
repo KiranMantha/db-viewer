@@ -56,3 +56,14 @@ body #app aside > ul > li > ul > li {
   text-transform: capitalize;
   margin-right: 5px;
 }
+.query-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.query-form input {
+  flex: 1 1 80%;
+}
+.query-form button {
+  flex: 1 1 20%;
+}
