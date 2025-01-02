@@ -44,3 +44,7 @@ Feel free to fork the repository and submit issues or pull requests. Contributio
 
 This extension is licensed under the MIT License. See the LICENSE file for more details.
 
+## Example extensions:
+
+- [qwtel.sqlite-viewer](https://marketplace.visualstudio.com/items?itemName=qwtel.sqlite-viewer)
+- [cweijan.vscode-mysql-client2](https://marketplace.visualstudio.com/items?itemName=cweijan.vscode-mysql-client2)
