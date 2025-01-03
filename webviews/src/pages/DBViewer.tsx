@@ -86,7 +86,6 @@ const DBViewer = () => {
       setTables(data.tables);
     }
     if (command === 'DISPLAY_QUERY_RESULTS') {
-      console.log(data);
       setTableInfo({ ...data });
     }
   };
