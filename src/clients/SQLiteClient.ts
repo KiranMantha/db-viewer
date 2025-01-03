@@ -29,19 +29,38 @@ export class SQLiteClient {
       .split('\n')
       .filter(Boolean)
       .map(async tableName => {
-        const columns = await this.executeCommand(`PRAGMA table_info(${tableName});`);
-        const columnDetails = columns
-          .split('\n')
-          .filter(Boolean)
-          .map(line => {
-            const [cid, name, type] = line.split('|');
-            return { name, type };
-          });
-
-        return { name: tableName, columns: columnDetails };
+        return await this.getTableMetadata(tableName);
       });
 
     return Promise.all(tableInfoPromises);
+  }
+
+  async getTableMetadata(tableName: string) {
+    const columns = await this.executeCommand(`PRAGMA table_info(${tableName});`);
+    const columnDetails = columns
+      .split('\n')
+      .filter(Boolean)
+      .map(line => {
+        const [cid, name, type, _notnull, _dflt_value, pk] = line.split('|');
+        return { name, type, isPrimaryKey: pk === '1', isForeignKey: false };
+      });
+
+    // Identify foreign keys
+    const foreignKeys = await this.executeCommand(`PRAGMA foreign_key_list(${tableName});`);
+
+    const foreignKeyColumns = foreignKeys
+      .split('\n')
+      .filter(Boolean)
+      .map(line => line.split('|')[3]); // Get the `from` column name
+
+    // Update columns to mark foreign keys
+    columnDetails.forEach(column => {
+      if (foreignKeyColumns.includes(column.name)) {
+        column.isForeignKey = true;
+      }
+    });
+
+    return { name: tableName, columns: columnDetails };
   }
 
   executeCommand(query: string): Promise<string> {

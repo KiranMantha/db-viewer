@@ -22,7 +22,6 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     };
     webviewView.webview.html = getHTMLForWebview(webviewView.webview, this._context.extensionPath, 'Sidebar');
     webviewView.webview.onDidReceiveMessage(({ command, ...rest }) => {
-      console.log('command', command, rest);
       this._executeCommand(command, rest);
     });
   }

@@ -9,10 +9,6 @@ export class DBViewerProvider {
   private _sqliteClient?: SQLiteClient;
   private _panel: vscode.WebviewPanel | null = null;
 
-  get sqliteClient() {
-    return this._sqliteClient;
-  }
-
   async loadDatabase(dbPath: string) {
     this._sqliteClient = new SQLiteClient(dbPath);
 
@@ -31,7 +27,6 @@ export class DBViewerProvider {
       'db-viewer'
     );
     this._panel.webview.onDidReceiveMessage(({ command, ...rest }) => {
-      console.log('command', command, rest);
       this._executeCommand(command, rest);
     });
     // Handle panel disposal.
@@ -55,25 +50,27 @@ export class DBViewerProvider {
 
   private async _queryDatabase() {
     const tables = await this._sqliteClient?.getTablesAndColumns();
-    console.log('tables', tables, this._panel);
     this._panel?.webview.postMessage({ command: 'DISPLAY_TABLES', data: { tables } });
   }
 
   private async _queryTable(tableName: string) {
-    const columnInfoQuery = `PRAGMA table_info(${tableName});`;
-    const selectQuery = `SELECT * FROM ${tableName} LIMIT 10;`;
+    const columnInfoQuery = `PRAGMA table_info(${tableName})`;
+    const selectQuery = `SELECT * FROM ${tableName}`;
     try {
-      console.log('select query', selectQuery);
       const columnInfoResult = await this._sqliteClient?.executeCommand(columnInfoQuery);
 
-      console.log('columnInfoResult', columnInfoResult);
       // Parse column info to get column names
-      const columns: string[] = (columnInfoResult || '')
+      const columns = (columnInfoResult || '')
         .split('\n')
         .filter(Boolean)
-        .map(line => line.split('|')[1]); // Assuming 2nd field is the column name
+        .map(line => {
+          const [_cid, name, _type, _notnull, _dflt_value, pk] = line.split('|');
+          return { name, isPrimaryKey: pk === '1' };
+        });
+
       // read actual data from select query
       const queryResult = await this._sqliteClient?.executeCommand(selectQuery);
+
       // Parse rows into an array of objects
       const rows = (queryResult || '')
         .split('\n')
@@ -81,7 +78,7 @@ export class DBViewerProvider {
         .map(row => {
           const values = row.split('|');
           return columns.reduce((obj, col, index) => {
-            obj[col] = values[index];
+            obj[col.name] = values[index];
             return obj;
           }, {} as Record<string, string>);
         });

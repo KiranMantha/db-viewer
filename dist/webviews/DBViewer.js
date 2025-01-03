@@ -134,7 +134,7 @@
     };
   }
   function j(n2, u3, t3, i3, r3, o3, e3, f3, c3, s3) {
-    var a3, h3, p3, v3, y3, g2, m3, b, C3, S2, M2, P2, I2, A2, H, L2, T2, F2 = u3.type;
+    var a3, h3, p3, v3, y3, g2, m3, b, C3, S2, M2, P2, I2, A3, H, L2, T3, F2 = u3.type;
     if (void 0 !== u3.constructor) return null;
     128 & t3.__u && (c3 = !!(32 & t3.__u), o3 = [f3 = u3.__e = t3.__e]), (a3 = l.__b) && a3(u3);
     n: if ("function" == typeof F2) try {
@@ -151,18 +151,18 @@
           h3.componentDidUpdate(v3, y3, g2);
         });
       }
-      if (h3.context = M2, h3.props = b, h3.__P = n2, h3.__e = false, I2 = l.__r, A2 = 0, C3) {
+      if (h3.context = M2, h3.props = b, h3.__P = n2, h3.__e = false, I2 = l.__r, A3 = 0, C3) {
         for (h3.state = h3.__s, h3.__d = false, I2 && I2(u3), a3 = h3.render(h3.props, h3.state, h3.context), H = 0; H < h3._sb.length; H++) h3.__h.push(h3._sb[H]);
         h3._sb = [];
       } else do {
         h3.__d = false, I2 && I2(u3), a3 = h3.render(h3.props, h3.state, h3.context), h3.state = h3.__s;
-      } while (h3.__d && ++A2 < 25);
+      } while (h3.__d && ++A3 < 25);
       h3.state = h3.__s, null != h3.getChildContext && (i3 = w(w({}, i3), h3.getChildContext())), C3 && !p3 && null != h3.getSnapshotBeforeUpdate && (g2 = h3.getSnapshotBeforeUpdate(v3, y3)), f3 = $(n2, d(L2 = null != a3 && a3.type === k && null == a3.key ? a3.props.children : a3) ? L2 : [L2], u3, t3, i3, r3, o3, e3, f3, c3, s3), h3.base = u3.__e, u3.__u &= -161, h3.__h.length && e3.push(h3), m3 && (h3.__E = h3.__ = null);
     } catch (n3) {
       if (u3.__v = null, c3 || null != o3) if (n3.then) {
         for (u3.__u |= c3 ? 160 : 128; f3 && 8 == f3.nodeType && f3.nextSibling; ) f3 = f3.nextSibling;
         o3[o3.indexOf(f3)] = null, u3.__e = f3;
-      } else for (T2 = o3.length; T2--; ) _(o3[T2]);
+      } else for (T3 = o3.length; T3--; ) _(o3[T3]);
       else u3.__e = t3.__e, u3.__k = t3.__k;
       l.__e(n3, u3, t3);
     }
@@ -317,6 +317,15 @@
     var i3 = d2(t2++, 3);
     !c2.__s && C2(i3.__H, u3) && (i3.__ = n2, i3.i = u3, r2.__H.__h.push(i3));
   }
+  function A2(n2) {
+    return o2 = 5, T2(function() {
+      return { current: n2 };
+    }, []);
+  }
+  function T2(n2, r3) {
+    var u3 = d2(t2++, 7);
+    return C2(u3.__H, r3) && (u3.__ = n2(), u3.__H = r3, u3.__h = n2), u3.__;
+  }
   function j2() {
     for (var n2; n2 = f2.shift(); ) if (n2.__P && n2.__H) try {
       n2.__H.__h.forEach(z2), n2.__H.__h.forEach(B2), n2.__H.__h = [];
@@ -392,9 +401,11 @@
     const [expandedNodes, setExpandedNodes] = h2(/* @__PURE__ */ new Set());
     const [tables, setTables] = h2([]);
     const [tableInfo, setTableInfo] = h2();
+    const selectedTable = A2("");
     const headers = tableInfo?.columns || [];
     const rows = tableInfo?.rows || [];
     const selectQuery = tableInfo?.selectQuery || "";
+    const primaryKeyHeader = headers.find((header) => header.isPrimaryKey);
     const toggleNode = (nodeName) => {
       setExpandedNodes((prev) => {
         const newExpandedNodes = new Set(prev);
@@ -411,17 +422,19 @@
       return /* @__PURE__ */ g("li", { key: table.name }, /* @__PURE__ */ g("div", null, /* @__PURE__ */ g("span", { className: "toggle-tree", onClick: () => toggleNode(table.name), style: {} }, table.columns ? isExpanded ? "[-]" : "[+]" : null), /* @__PURE__ */ g("span", { className: "tree-name", onClick: () => getRecordsFromTable(table.name) }, table.name)), table.columns && isExpanded && /* @__PURE__ */ g("ul", null, table.columns.map(({ name, type }) => /* @__PURE__ */ g("li", { key: `${table.name}-${name}-${type}` }, /* @__PURE__ */ g("span", { className: "leaf-name" }, name), /* @__PURE__ */ g("span", null, "(", type, ")")))));
     };
     const getRecordsFromTable = (tableName) => {
+      selectedTable.current = tableName;
       vscodeApi.postMessage({ command: "QUERY_TABLE", tableName });
     };
     const handleUpdateRecord = (e3) => {
       e3.preventDefault();
       const formData = new FormData(e3.currentTarget);
-      console.log(JSON.stringify(Object.fromEntries(formData), null, 4));
-    };
-    const handleSelectQuery = (e3) => {
-      e3.preventDefault();
-      const formData = new FormData(e3.currentTarget);
-      vscodeApi.postMessage({ command: "QUERY_TABLE", selectQuery: formData.get("selectQuery") });
+      vscodeApi.postMessage({
+        command: "UPDATE_RECORD",
+        tableName: selectedTable.current,
+        record: Object.fromEntries(formData),
+        primaryKey: primaryKeyHeader?.name,
+        primaryKeyType: primaryKeyHeader?.type
+      });
     };
     const handleMessage = (event) => {
       console.log("tsx event inside component", event);
@@ -430,6 +443,7 @@
         setTables(data.tables);
       }
       if (command === "DISPLAY_QUERY_RESULTS") {
+        console.log(data);
         setTableInfo({ ...data });
       }
     };
@@ -438,46 +452,37 @@
       vscodeApi.postMessage({ command: "QUERY_DATABASE" });
       return () => window.removeEventListener("message", handleMessage);
     }, []);
-    return /* @__PURE__ */ g(k, null, /* @__PURE__ */ g("aside", null, /* @__PURE__ */ g("h2", null, "Tables"), /* @__PURE__ */ g("ul", null, tables.map((table) => renderTreeNode(table)))), /* @__PURE__ */ g("main", null, tableInfo ? /* @__PURE__ */ g(k, null, /* @__PURE__ */ g("form", { method: "GET", id: "select-query-form", onSubmit: handleSelectQuery }, /* @__PURE__ */ g("input", { type: "text", name: "selectQuery", defaultValue: selectQuery }), /* @__PURE__ */ g("button", { type: "submit" }, "Send Query")), /* @__PURE__ */ g("table", null, /* @__PURE__ */ g("thead", null, /* @__PURE__ */ g("tr", null, headers.map((header) => /* @__PURE__ */ g("th", { key: header }, header)), /* @__PURE__ */ g("th", null))), /* @__PURE__ */ g("tbody", null, rows.map((row, index) => /* @__PURE__ */ g("tr", { key: index }, headers.map((header, headerIndex) => /* @__PURE__ */ g("td", { key: header }, headerIndex === 0 ? /* @__PURE__ */ g(k, null, /* @__PURE__ */ g(
+    return /* @__PURE__ */ g(k, null, /* @__PURE__ */ g("aside", null, /* @__PURE__ */ g("h2", null, "Tables"), /* @__PURE__ */ g("ul", null, tables.map((table) => renderTreeNode(table)))), /* @__PURE__ */ g("main", null, /* @__PURE__ */ g("div", { className: "table-actions" }, /* @__PURE__ */ g("button", null, "DB ER Diagram")), tableInfo ? /* @__PURE__ */ g(k, null, /* @__PURE__ */ g("div", { className: "table-responsive" }, /* @__PURE__ */ g("table", null, /* @__PURE__ */ g("thead", null, /* @__PURE__ */ g("tr", null, headers.map((header) => /* @__PURE__ */ g("th", { key: header.name }, header.name, " ", header.isPrimaryKey ? "(PK)" : header.isForeignKey ? "(FK)" : "")), /* @__PURE__ */ g("th", null))), /* @__PURE__ */ g("tbody", null, rows.map((row, index) => /* @__PURE__ */ g("tr", { key: index }, headers.map((header) => /* @__PURE__ */ g("td", { key: header.name }, header.isPrimaryKey ? /* @__PURE__ */ g(
       "form",
       {
         method: "GET",
-        id: `inline-form-${row[headers[0]] ?? ""}`,
+        id: `inline-form-${row[primaryKeyHeader?.name || ""] ?? ""}`,
         onSubmit: handleUpdateRecord
       }
-    ), /* @__PURE__ */ g(
+    ) : null, header.isPrimaryKey || header.isForeignKey ? /* @__PURE__ */ g(k, null, /* @__PURE__ */ g(
       "input",
       {
         type: "hidden",
-        name: header,
-        defaultValue: row[header] ?? "",
-        form: `inline-form-${row[headers[0]] ?? ""}`
+        name: header.name,
+        defaultValue: row[header.name] ?? "",
+        form: `inline-form-${row[primaryKeyHeader?.name || ""] ?? ""}`
       }
-    ), row[header] ?? "") : /* @__PURE__ */ g(
+    ), row[header.name] ?? "") : /* @__PURE__ */ g(
       "input",
       {
         type: "text",
-        name: header,
-        defaultValue: row[header] ?? "",
-        form: `inline-form-${row[headers[0]] ?? ""}`
+        name: header.name,
+        defaultValue: row[header.name] ?? "",
+        form: `inline-form-${row[primaryKeyHeader?.name || ""] ?? ""}`
       }
-    ))), /* @__PURE__ */ g("td", null, /* @__PURE__ */ g("button", { title: "Save Record", className: "inline", form: `inline-form-${row[headers[0]] ?? ""}` }, /* @__PURE__ */ g(
-      "svg",
+    ))), /* @__PURE__ */ g("td", null, /* @__PURE__ */ g(
+      "button",
       {
-        width: "16",
-        height: "16",
-        viewBox: "0 0 16 16",
-        xmlns: "http://www.w3.org/2000/svg",
-        fill: "currentColor"
+        title: "Save Record",
+        className: "inline",
+        form: `inline-form-${row[primaryKeyHeader?.name || ""] ?? ""}`
       },
-      /* @__PURE__ */ g(
-        "path",
-        {
-          "fill-rule": "evenodd",
-          "clip-rule": "evenodd",
-          d: "M13.353 1.146l1.5 1.5L15 3v11.5l-.5.5h-13l-.5-.5v-13l.5-.5H13l.353.146zM2 2v12h12V3.208L12.793 2H11v4H4V2H2zm6 0v3h2V2H8z"
-        }
-      )
+      "Save"
     )))))))) : null));
   };
   D(/* @__PURE__ */ g(DBViewer, null), document.getElementById("app"));

@@ -54,7 +54,6 @@ export class SQLiteCustomEditorProvider implements vscode.CustomReadonlyEditorPr
     );
 
     webviewPanel.webview.onDidReceiveMessage(({ command, ...rest }) => {
-      console.log('command', command, rest);
       this._executeCommand(command, rest);
     });
     this._panel = webviewPanel;
@@ -67,7 +66,11 @@ export class SQLiteCustomEditorProvider implements vscode.CustomReadonlyEditorPr
         break;
       }
       case 'QUERY_TABLE': {
-        this._queryTable(args.tableName || '', args.selectQuery || '');
+        this._queryTable(args.tableName);
+        break;
+      }
+      case 'UPDATE_RECORD': {
+        this._updateTable(args.tableName, args.record, args.primaryKey, args.primaryKeyType);
         break;
       }
     }
@@ -75,55 +78,18 @@ export class SQLiteCustomEditorProvider implements vscode.CustomReadonlyEditorPr
 
   private async _queryDatabase() {
     const tables = await this._sqliteClient?.getTablesAndColumns();
-    console.log('tables', tables, this._panel);
     this._panel?.webview.postMessage({ command: 'DISPLAY_TABLES', data: { tables } });
   }
 
-  private _getQueryMetadata(query: string) {
-    // Regex to match SELECT columns or *
-    const regex = /(?<=select\s+)(\*|[\w,\s]+)\s+from\s+(\w+)(?=\s*(?:as\s+)?\w*)/i;
-
-    // Match the query
-    const match = regex.exec(query);
-
-    // If there's no match, return null (or an empty object if you prefer)
-    if (!match) {
-      return { tableName: '', columns: [] };
-    }
-
-    // Extract table name
-    const tableName = match[2];
-
-    // If the columns part is "*", return empty array for columns
-    const columns = match[1] === '*' ? [] : match[1].split(/\s*,\s*/); // Split by comma and optional spaces
-
-    // Return the result in the desired format
-    return {
-      tableName,
-      columns
-    };
-  }
-
-  private async _queryTable(tableName: string, query: string) {
-    const selectQuery = tableName ? `SELECT * FROM ${tableName} LIMIT 10` : query;
-    const metadata = this._getQueryMetadata(selectQuery);
-    const columnInfoQuery = `PRAGMA table_info(${metadata.tableName})`;
-    let columns: string[] = metadata.columns;
-
+  private async _queryTable(tableName: string) {
     try {
-      console.log('select query', selectQuery);
-      if (!columns.length) {
-        const columnInfoResult = await this._sqliteClient?.executeCommand(columnInfoQuery);
+      const selectQuery = `SELECT * FROM ${tableName}`;
+      const tableMetadata = await this._sqliteClient?.getTableMetadata(tableName);
+      const columns = tableMetadata?.columns || [];
 
-        console.log('columnInfoResult', columnInfoResult);
-        // Parse column info to get column names
-        columns = (columnInfoResult || '')
-          .split('\n')
-          .filter(Boolean)
-          .map(line => line.split('|')[1]); // Assuming 2nd field is the column name
-      }
       // read actual data from select query
       const queryResult = await this._sqliteClient?.executeCommand(selectQuery);
+
       // Parse rows into an array of objects
       const rows = (queryResult || '')
         .split('\n')
@@ -131,16 +97,50 @@ export class SQLiteCustomEditorProvider implements vscode.CustomReadonlyEditorPr
         .map(row => {
           const values = row.split('|');
           return columns.reduce((obj, col, index) => {
-            obj[col] = values[index];
+            obj[col.name] = values[index];
             return obj;
           }, {} as Record<string, string>);
         });
-      this._panel?.webview.postMessage({
-        command: 'DISPLAY_QUERY_RESULTS',
-        data: { tableName, columns, rows, selectQuery }
-      });
+      this._panel?.webview.postMessage({ command: 'DISPLAY_QUERY_RESULTS', data: { tableName, columns, rows } });
     } catch (error) {
       vscode.window.showErrorMessage(`Failed to query table "${tableName}": ${(error as { message: string }).message}`);
+    }
+  }
+
+  private async _updateTable(
+    tableName: string,
+    record: Record<string, string>,
+    primaryKey: string,
+    primaryKeyType: string
+  ) {
+    try {
+      // Extract primary key value and ensure it exists in the record
+      const primaryKeyValue = record[primaryKey];
+      if (!primaryKeyValue) {
+        throw new Error(`Primary key '${primaryKey}' is missing or undefined in the record.`);
+      }
+      // Construct the SET clause by excluding the primary key
+      const setClause = Object.entries(record)
+        .filter(([key]) => key !== primaryKey) // Exclude the primary key from the SET clause
+        .map(([key, value]) => `${key} = '${value}'`) // Format each field as key = 'value'
+        .join(', ');
+
+      const updateStatement = `UPDATE ${tableName} SET ${setClause} WHERE ${primaryKey} = ${
+        primaryKeyType === 'INTEGER' ? parseInt(primaryKeyValue, 10) : `${primaryKeyValue}`
+      }; SELECT changes();`;
+      const result = (await this._sqliteClient?.executeCommand(updateStatement)) || '';
+      const rowsAffected = parseInt(result.split('\n').pop() || '', 10);
+      if (rowsAffected > 0) {
+        vscode.window.showInformationMessage(`${rowsAffected} row(s) updated successfully.`);
+      } else {
+        vscode.window.showWarningMessage(
+          `No rows were updated. Check the query conditions. UPDATE STMT: ${updateStatement}`
+        );
+      }
+    } catch (error) {
+      vscode.window.showErrorMessage(
+        `Failed to update table "${tableName}": ${(error as { message: string }).message}`
+      );
     }
   }
 }

@@ -1,26 +1,28 @@
 import { Fragment, h, render } from 'preact';
-import { useEffect, useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 
 type TableInfo = {
   tableName: string;
   rows: Record<string, any>[];
-  columns: string[];
+  columns: Array<{ name: string; type: string; isPrimaryKey: boolean; isForeignKey: boolean }>;
   selectQuery: string;
 };
 
 interface TableNode {
   name: string;
-  columns: Array<{ name: string; type: string }>;
+  columns: Array<{ name: string; type: string; isPrimaryKey: boolean; isForeignKey: boolean }>;
 }
 
 const DBViewer = () => {
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
   const [tables, setTables] = useState<TableNode[]>([]);
   const [tableInfo, setTableInfo] = useState<TableInfo>();
+  const selectedTable = useRef<string>('');
 
   const headers = tableInfo?.columns || [];
   const rows = tableInfo?.rows || [];
   const selectQuery = tableInfo?.selectQuery || '';
+  const primaryKeyHeader = headers.find(header => header.isPrimaryKey);
 
   const toggleNode = (nodeName: string) => {
     setExpandedNodes(prev => {
@@ -61,19 +63,20 @@ const DBViewer = () => {
   };
 
   const getRecordsFromTable = (tableName: string) => {
+    selectedTable.current = tableName;
     vscodeApi.postMessage({ command: 'QUERY_TABLE', tableName });
   };
 
   const handleUpdateRecord = (e: any) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    console.log(JSON.stringify(Object.fromEntries(formData), null, 4));
-  };
-
-  const handleSelectQuery = (e: any) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    vscodeApi.postMessage({ command: 'QUERY_TABLE', selectQuery: formData.get('selectQuery') });
+    vscodeApi.postMessage({
+      command: 'UPDATE_RECORD',
+      tableName: selectedTable.current,
+      record: Object.fromEntries(formData),
+      primaryKey: primaryKeyHeader?.name,
+      primaryKeyType: primaryKeyHeader?.type
+    });
   };
 
   const handleMessage = (event: MessageEvent) => {
@@ -83,6 +86,7 @@ const DBViewer = () => {
       setTables(data.tables);
     }
     if (command === 'DISPLAY_QUERY_RESULTS') {
+      console.log(data);
       setTableInfo({ ...data });
     }
   };
@@ -100,73 +104,69 @@ const DBViewer = () => {
         <ul>{tables.map(table => renderTreeNode(table))}</ul>
       </aside>
       <main>
+        <div className="table-actions">
+          <button>DB ER Diagram</button>
+        </div>
         {tableInfo ? (
           <>
-            <form className="query-form" method="GET" id="select-query-form" onSubmit={handleSelectQuery}>
-              <input type="text" name="selectQuery" defaultValue={selectQuery} />
-              <button type="submit">Send Query</button>
-            </form>
-            <table>
-              <thead>
-                <tr>
-                  {headers.map(header => (
-                    <th key={header}>{header}</th>
-                  ))}
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((row, index) => (
-                  <tr key={index}>
-                    {headers.map((header, headerIndex) => (
-                      <td key={header}>
-                        {headerIndex === 0 ? (
-                          <>
+            <div className="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    {headers.map(header => (
+                      <th key={header.name}>
+                        {header.name} {header.isPrimaryKey ? '(PK)' : header.isForeignKey ? '(FK)' : ''}
+                      </th>
+                    ))}
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map((row, index) => (
+                    <tr key={index}>
+                      {headers.map(header => (
+                        <td key={header.name}>
+                          {header.isPrimaryKey ? (
                             <form
                               method="GET"
-                              id={`inline-form-${row[headers[0]] ?? ''}`}
+                              id={`inline-form-${row[primaryKeyHeader?.name || ''] ?? ''}`}
                               onSubmit={handleUpdateRecord}
                             ></form>
+                          ) : null}
+                          {header.isPrimaryKey || header.isForeignKey ? (
+                            <>
+                              <input
+                                type="hidden"
+                                name={header.name}
+                                defaultValue={row[header.name] ?? ''}
+                                form={`inline-form-${row[primaryKeyHeader?.name || ''] ?? ''}`}
+                              />
+                              {row[header.name] ?? ''}
+                            </>
+                          ) : (
                             <input
-                              type="hidden"
-                              name={header}
-                              defaultValue={row[header] ?? ''}
-                              form={`inline-form-${row[headers[0]] ?? ''}`}
+                              type="text"
+                              name={header.name}
+                              defaultValue={row[header.name] ?? ''}
+                              form={`inline-form-${row[primaryKeyHeader?.name || ''] ?? ''}`}
                             />
-                            {row[header] ?? ''}
-                          </>
-                        ) : (
-                          <input
-                            type="text"
-                            name={header}
-                            defaultValue={row[header] ?? ''}
-                            form={`inline-form-${row[headers[0]] ?? ''}`}
-                          />
-                        )}
-                      </td>
-                    ))}
-                    <td>
-                      <button title="Save Record" className="inline" form={`inline-form-${row[headers[0]] ?? ''}`}>
-                        {/* <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 16 16"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="currentColor"
+                          )}
+                        </td>
+                      ))}
+                      <td>
+                        <button
+                          title="Save Record"
+                          className="inline"
+                          form={`inline-form-${row[primaryKeyHeader?.name || ''] ?? ''}`}
                         >
-                          <path
-                            fill-rule="evenodd"
-                            clip-rule="evenodd"
-                            d="M13.353 1.146l1.5 1.5L15 3v11.5l-.5.5h-13l-.5-.5v-13l.5-.5H13l.353.146zM2 2v12h12V3.208L12.793 2H11v4H4V2H2zm6 0v3h2V2H8z"
-                          />
-                        </svg> */}
-                        Save
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                          Save
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </>
         ) : null}
       </main>

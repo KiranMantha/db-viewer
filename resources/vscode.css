@@ -97,7 +97,7 @@ textarea::placeholder {
 }
 
 table {
-  width: 100%;
+  width: max-content;
   table-layout: fixed;
   border-collapse: separate;
   border-spacing: 0px;
@@ -150,4 +150,10 @@ tfoot {
 tfoot td {
   text-align: left;
   font-weight: bold;
+}
+
+.table-responsive {
+  width: 100%;
+  max-width: 100%;
+  overflow: auto;
 }

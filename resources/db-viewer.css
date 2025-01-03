@@ -4,26 +4,32 @@ body {
 }
 body #app {
   height: 100%;
-  display: flex;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: 1fr;
+  grid-gap: 0;
   margin: 0;
   border-top: 1px solid #666;
+  overflow: hidden;
+}
+body #app header {
+  grid-column: span 12;
+  border-bottom: 1px solid #666;
 }
 body #app aside {
-  width: 30%;
+  grid-column: span 3;
   border-right: 1px solid #666;
-  padding-right: 16px;
-  padding-top: 16px;
 }
 body #app main {
-  flex: 1;
-  padding: 16px 0;
+  grid-column: span 9;
 }
 body #app aside h2 {
+  display: flex;
+  align-items: center;
   font-weight: bold;
   border-bottom: 1px solid #666;
-  margin-bottom: 16px;
-  padding-bottom: 16px;
+  margin-bottom: 10px;
+  height: 40px;
 }
 body #app aside ul {
   list-style: none;
@@ -56,14 +62,22 @@ body #app aside > ul > li > ul > li {
   text-transform: capitalize;
   margin-right: 5px;
 }
-.query-form {
+
+.table-actions {
   display: flex;
-  gap: 10px;
-  margin-bottom: 10px;
+  align-items: center;
+  justify-content: flex-end;
+  height: 40px;
+  padding-left: 10px;
+  border-bottom: 1px solid #666;
 }
-.query-form input {
-  flex: 1 1 80%;
+.table-actions button {
+  width: auto;
 }
-.query-form button {
-  flex: 1 1 20%;
+.table-responsive {
+  padding: 10px;
+  padding-right: 0;
+}
+.table-responsive table {
+  width: max-content;
 }
