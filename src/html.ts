@@ -27,8 +27,33 @@ export const getHTMLForWebview = (
                 <script nonce="${nonce}">
                     const vscodeApi = acquireVsCodeApi();
                 </script>
+                <!--svg styles-->
+                <style type="text/css">
+                  .st0{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+                  .st1{fill:none;stroke-width:2;stroke-linejoin:round;stroke-miterlimit:10;}
+                </style>
             </head>
             <body>
+                <svg style="display: none">
+                  <defs>
+                    <g id="chevron-down">
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </g>
+                    <g id="chevron-right">
+                      <polyline points="9 18 15 12 9 6"></polyline>
+                    </g>
+                    <g id="chevron-left">
+                      <polyline points="15 18 9 12 15 6"></polyline>
+                    </g>
+                    <g id="chevron-up">
+                      <polyline points="18 15 12 9 6 15"></polyline>
+                    </g>
+                    <g id="tag">
+                      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                      <line x1="7" y1="7" x2="7" y2="7"></line>
+                    </g>
+                  </defs>
+                </svg>
                 <div id="app"></div>
                 <script nonce="${nonce}" src="${scriptUri}"></script>
             </body>

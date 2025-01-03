@@ -1,3 +1,4 @@
+import { Icon } from 'components';
 import { Fragment, h, render } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
 
@@ -40,9 +41,9 @@ const DBViewer = () => {
     const isExpanded = expandedNodes.has(table.name);
     return (
       <li key={table.name}>
-        <div>
-          <span className="toggle-tree" onClick={() => toggleNode(table.name)} style={{}}>
-            {table.columns ? (isExpanded ? '[-]' : '[+]') : null}
+        <div className="tree-node">
+          <span className="cursor" onClick={() => toggleNode(table.name)}>
+            {table.columns ? <Icon name={isExpanded ? 'chevron-down' : 'chevron-right'} /> : null}
           </span>
           <span className="tree-name" onClick={() => getRecordsFromTable(table.name)}>
             {table.name}
@@ -50,10 +51,12 @@ const DBViewer = () => {
         </div>
         {table.columns && isExpanded && (
           <ul>
-            {table.columns.map(({ name, type }) => (
-              <li key={`${table.name}-${name}-${type}`}>
+            {table.columns.map(({ name, type, isPrimaryKey, isForeignKey }) => (
+              <li key={`${table.name}-${name}-${type}`} className="leaf-node">
                 <span className="leaf-name">{name}</span>
                 <span>({type})</span>
+                {isPrimaryKey ? <Icon name="tag" color="#ffff00" size={12} /> : null}
+                {isForeignKey ? <Icon name="tag" color="#0d6efd" size={12} /> : null}
               </li>
             ))}
           </ul>
@@ -158,7 +161,7 @@ const DBViewer = () => {
                           className="inline"
                           form={`inline-form-${row[primaryKeyHeader?.name || ''] ?? ''}`}
                         >
-                          Save
+                          <Icon name="save" />
                         </button>
                       </td>
                     </tr>

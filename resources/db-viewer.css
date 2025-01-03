@@ -49,10 +49,15 @@ body #app aside > ul > li > ul {
 body #app aside > ul > li > ul > li {
   margin: 5px 0;
 }
-.toggle-tree {
+.cursor {
   cursor: pointer;
   user-select: none;
-  margin-right: 5px;
+}
+.tree-node,
+.leaf-node {
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 .tree-name {
   font-weight: bold;
@@ -60,9 +65,7 @@ body #app aside > ul > li > ul > li {
 }
 .leaf-name {
   text-transform: capitalize;
-  margin-right: 5px;
 }
-
 .table-actions {
   display: flex;
   align-items: center;

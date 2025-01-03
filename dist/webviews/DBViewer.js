@@ -257,6 +257,73 @@
     return n2.__v.__b - l3.__v.__b;
   }, P.__r = 0, f = /(PointerCapture)$|Capture$/i, c = 0, s = O(false), a = O(true), h = 0;
 
+  // webviews/src/components/Icon.tsx
+  var Icon = ({ name, color = "#fff", size = 18 }) => {
+    if (name === "table") {
+      return /* @__PURE__ */ g(
+        "svg",
+        {
+          version: "1.1",
+          id: "Icons",
+          xmlns: "http://www.w3.org/2000/svg",
+          x: "0px",
+          y: "0px",
+          viewBox: "0 0 32 32",
+          width: `${size}px`,
+          height: `${size}px`,
+          style: "enable-background:new 0 0 32 32;",
+          "xml:space": "preserve"
+        },
+        /* @__PURE__ */ g(
+          "path",
+          {
+            stroke: color,
+            d: "M27,4H5C3.3,4,2,5.3,2,7v18c0,1.7,1.3,3,3,3h22c1.7,0,3-1.3,3-3V7C30,5.3,28.7,4,27,4z M13,20v-4h7v4H13z M20,22v4h-7v-4H20\n	z M20,10v4h-7v-4H20z M28,10v4h-6v-4H28z M11,14H4v-4h7V14z M4,16h7v4H4V16z M22,16h6v4h-6V16z M4,25v-3h7v4H5C4.4,26,4,25.6,4,25z\n	 M27,26h-5v-4h6v3C28,25.6,27.6,26,27,26z"
+          }
+        )
+      );
+    }
+    if (name === "save") {
+      return /* @__PURE__ */ g(
+        "svg",
+        {
+          version: "1.1",
+          id: "Icons",
+          xmlns: "http://www.w3.org/2000/svg",
+          x: "0px",
+          y: "0px",
+          viewBox: "0 0 32 32",
+          width: `${size}px`,
+          height: `${size}px`,
+          style: "enable-background:new 0 0 32 32;",
+          "xml:space": "preserve"
+        },
+        /* @__PURE__ */ g("ellipse", { class: "st0", stroke: color, cx: "14", cy: "8", rx: "10", ry: "5" }),
+        /* @__PURE__ */ g("line", { class: "st0", stroke: color, x1: "24", y1: "16", x2: "24", y2: "8" }),
+        /* @__PURE__ */ g("path", { class: "st0", stroke: color, d: "M4,8v8c0,2.8,4.5,5,10,5c1.2,0,2.3-0.1,3.4-0.3" }),
+        /* @__PURE__ */ g("path", { class: "st0", stroke: color, d: "M4,16v8c0,2.8,4.5,5,10,5c2,0,3.8-0.3,5.3-0.8" }),
+        /* @__PURE__ */ g("circle", { class: "st0", stroke: color, cx: "24", cy: "23", r: "7" }),
+        /* @__PURE__ */ g("line", { class: "st0", stroke: color, x1: "24", y1: "16", x2: "24", y2: "26" }),
+        /* @__PURE__ */ g("polyline", { class: "st0", stroke: color, points: "21,23 24,26 27,23 " })
+      );
+    }
+    return /* @__PURE__ */ g(
+      "svg",
+      {
+        xmlns: "http://www.w3.org/2000/svg",
+        viewBox: "0 0 24 24",
+        width: `${size}px`,
+        height: `${size}px`,
+        fill: "none",
+        stroke: color,
+        "stroke-width": "2",
+        "stroke-linecap": "round",
+        "stroke-linejoin": "round"
+      },
+      /* @__PURE__ */ g("use", { "xlink:href": `#${name}` })
+    );
+  };
+
   // node_modules/preact/hooks/dist/hooks.module.js
   var t2;
   var r2;
@@ -419,7 +486,7 @@
     };
     const renderTreeNode = (table) => {
       const isExpanded = expandedNodes.has(table.name);
-      return /* @__PURE__ */ g("li", { key: table.name }, /* @__PURE__ */ g("div", null, /* @__PURE__ */ g("span", { className: "toggle-tree", onClick: () => toggleNode(table.name), style: {} }, table.columns ? isExpanded ? "[-]" : "[+]" : null), /* @__PURE__ */ g("span", { className: "tree-name", onClick: () => getRecordsFromTable(table.name) }, table.name)), table.columns && isExpanded && /* @__PURE__ */ g("ul", null, table.columns.map(({ name, type }) => /* @__PURE__ */ g("li", { key: `${table.name}-${name}-${type}` }, /* @__PURE__ */ g("span", { className: "leaf-name" }, name), /* @__PURE__ */ g("span", null, "(", type, ")")))));
+      return /* @__PURE__ */ g("li", { key: table.name }, /* @__PURE__ */ g("div", { className: "tree-node" }, /* @__PURE__ */ g("span", { className: "cursor", onClick: () => toggleNode(table.name) }, table.columns ? /* @__PURE__ */ g(Icon, { name: isExpanded ? "chevron-down" : "chevron-right" }) : null), /* @__PURE__ */ g("span", { className: "tree-name", onClick: () => getRecordsFromTable(table.name) }, table.name)), table.columns && isExpanded && /* @__PURE__ */ g("ul", null, table.columns.map(({ name, type, isPrimaryKey, isForeignKey }) => /* @__PURE__ */ g("li", { key: `${table.name}-${name}-${type}`, className: "leaf-node" }, /* @__PURE__ */ g("span", { className: "leaf-name" }, name), /* @__PURE__ */ g("span", null, "(", type, ")"), isPrimaryKey ? /* @__PURE__ */ g(Icon, { name: "tag", color: "#ffff00", size: 12 }) : null, isForeignKey ? /* @__PURE__ */ g(Icon, { name: "tag", color: "#0e639c", size: 12 }) : null))));
     };
     const getRecordsFromTable = (tableName) => {
       selectedTable.current = tableName;
@@ -443,7 +510,6 @@
         setTables(data.tables);
       }
       if (command === "DISPLAY_QUERY_RESULTS") {
-        console.log(data);
         setTableInfo({ ...data });
       }
     };
@@ -482,7 +548,7 @@
         className: "inline",
         form: `inline-form-${row[primaryKeyHeader?.name || ""] ?? ""}`
       },
-      "Save"
+      /* @__PURE__ */ g(Icon, { name: "save" })
     )))))))) : null));
   };
   D(/* @__PURE__ */ g(DBViewer, null), document.getElementById("app"));
