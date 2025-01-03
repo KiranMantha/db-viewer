@@ -1,5 +1,5 @@
 import { Icon } from 'components';
-import { Fragment, h, render } from 'preact';
+import { render } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { ERDiagram } from './ERDiagram';
 

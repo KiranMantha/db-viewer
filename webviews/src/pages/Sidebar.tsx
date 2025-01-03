@@ -1,4 +1,4 @@
-import { h, render } from 'preact';
+import { render } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 import Button from '../components/Button';
 

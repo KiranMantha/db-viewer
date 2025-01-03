@@ -2,9 +2,8 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
-    "jsx": "react", // Use "react" for Preact compatibility
-    "jsxFactory": "h", // Use `h` as the factory function for JSX
-    "jsxFragmentFactory": "Fragment", // Preact's fragment support
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
     "moduleResolution": "Node",
     "esModuleInterop": true,
     "strict": true,

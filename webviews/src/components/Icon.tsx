@@ -1,5 +1,3 @@
-import { h } from 'preact';
-
 export const Icon = ({ name, color = '#fff', size = 18 }: { name: string; color?: string; size?: number }) => {
   if (name === 'table') {
     return (

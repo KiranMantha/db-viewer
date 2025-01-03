@@ -1,4 +1,4 @@
-import { Fragment, h, render } from 'preact';
+import { render } from 'preact';
 
 type Props = {
   tableName: string;

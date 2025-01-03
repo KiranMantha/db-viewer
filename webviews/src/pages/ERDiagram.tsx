@@ -1,5 +1,4 @@
 import * as d3 from 'd3';
-import { h } from 'preact';
 import { useEffect, useRef } from 'preact/hooks';
 
 interface Column {
