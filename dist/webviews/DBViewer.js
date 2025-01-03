@@ -2890,7 +2890,7 @@
     };
     const handleToggleSchema = () => {
       if (!showERDiagram) {
-        vscodeApi.postMessage({ command: "EXTRACT_SCHEMA" });
+        !dbSchema ? vscodeApi.postMessage({ command: "EXTRACT_SCHEMA" }) : setShowERDiagram(true);
       } else {
         setShowERDiagram(false);
       }
@@ -2903,9 +2903,9 @@
       }
       if (command === "DISPLAY_QUERY_RESULTS") {
         setTableInfo({ ...data });
+        setShowERDiagram(false);
       }
       if (command === "LOAD_SCHEMA") {
-        console.log(data);
         setDBSchema({ ...data.schema });
         setShowERDiagram(true);
       }
