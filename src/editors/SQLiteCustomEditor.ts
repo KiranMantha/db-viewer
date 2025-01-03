@@ -73,6 +73,10 @@ export class SQLiteCustomEditorProvider implements vscode.CustomReadonlyEditorPr
         this._updateTable(args.tableName, args.record, args.primaryKey, args.primaryKeyType);
         break;
       }
+      case 'EXTRACT_SCHEMA': {
+        this._parseSchemaFromSQL();
+        break;
+      }
     }
   }
 
@@ -142,5 +146,64 @@ export class SQLiteCustomEditorProvider implements vscode.CustomReadonlyEditorPr
         `Failed to update table "${tableName}": ${(error as { message: string }).message}`
       );
     }
+  }
+
+  private async _parseSchemaFromSQL() {
+    const schema: Record<string, any> = {};
+    const schemaSQL = await this._sqliteClient?.extractSchema();
+    const schemaText = (schemaSQL || []).join(' ').replace(/\s+/g, ' '); // Join and normalize whitespaces
+
+    // Regex to match CREATE TABLE statement
+    const tableRegex = /CREATE TABLE (\w+) \((.*?)\);/gi;
+
+    let matchTable;
+    while ((matchTable = tableRegex.exec(schemaText)) !== null) {
+      const tableName = matchTable[1];
+      const columnsText = matchTable[2];
+
+      // Process columns
+      const columns = columnsText
+        .split(',')
+        .map(col => col.trim())
+        .filter(col => col !== '') // Remove empty columns
+        .map(col => {
+          const parts = col.split(' ');
+          const columnName = parts[0];
+          const columnType = parts[1];
+          const constraints = parts.slice(2).join(' '); // Constraints can include multiple parts
+
+          return { name: columnName, type: columnType, constraints };
+        });
+
+      schema[tableName] = { columns, foreignKeys: [] };
+    }
+
+    // Regex to match FOREIGN KEY constraints
+    const foreignKeyRegex = /FOREIGN KEY \((.*?)\) REFERENCES (\w+)\((.*?)\)/gi;
+
+    let matchForeignKey;
+    while ((matchForeignKey = foreignKeyRegex.exec(schemaText)) !== null) {
+      const fromColumns = matchForeignKey[1].split(',').map(col => col.trim());
+      const toTable = matchForeignKey[2];
+      const toColumns = matchForeignKey[3].split(',').map(col => col.trim());
+
+      // Find the table that holds the foreign key reference
+      const fromTable = Object.keys(schema).find(table =>
+        schema[table].columns.some((col: { name: string }) => fromColumns.includes(col.name))
+      );
+
+      if (fromTable) {
+        schema[fromTable].foreignKeys.push({
+          fromColumns,
+          toTable,
+          toColumns
+        });
+      }
+    }
+
+    console.log('Parsed schema:', schema);
+
+    // Post the schema to the webview (or other UI component)
+    this._panel?.webview.postMessage({ command: 'LOAD_SCHEMA', data: { schema } });
   }
 }

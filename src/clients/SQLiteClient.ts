@@ -3,7 +3,7 @@ import * as fs from 'fs';
 
 export interface TableInfo {
   name: string;
-  columns: { name: string; type: string }[];
+  columns: { name: string; type: string; isPrimaryKey: boolean; isForeignKey: boolean }[];
 }
 
 export class SQLiteClient {
@@ -80,5 +80,14 @@ export class SQLiteClient {
         resolve(stdout.trim());
       });
     });
+  }
+
+  async extractSchema(): Promise<string[]> {
+    try {
+      const stdout = await this.executeCommand('.schema');
+      return stdout.split('\n').filter(line => line.trim() !== ''); // Filter out empty lines
+    } catch (error) {
+      throw new Error(`Failed to extract schema: ${(error as { message: string }).message}`);
+    }
   }
 }

@@ -157,3 +157,6 @@ tfoot td {
   max-width: 100%;
   overflow: auto;
 }
+.table-responsive.hide {
+  display: none;
+}

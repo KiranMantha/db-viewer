@@ -1,6 +1,7 @@
 import { Icon } from 'components';
 import { Fragment, h, render } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
+import { ERDiagram } from './ERDiagram';
 
 type TableInfo = {
   tableName: string;
@@ -18,6 +19,8 @@ const DBViewer = () => {
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
   const [tables, setTables] = useState<TableNode[]>([]);
   const [tableInfo, setTableInfo] = useState<TableInfo>();
+  const [dbSchema, setDBSchema] = useState();
+  const [showERDiagram, setShowERDiagram] = useState<boolean>(false);
   const selectedTable = useRef<string>('');
 
   const headers = tableInfo?.columns || [];
@@ -82,6 +85,14 @@ const DBViewer = () => {
     });
   };
 
+  const handleToggleSchema = () => {
+    if (!showERDiagram) {
+      vscodeApi.postMessage({ command: 'EXTRACT_SCHEMA' });
+    } else {
+      setShowERDiagram(false);
+    }
+  };
+
   const handleMessage = (event: MessageEvent) => {
     console.log('tsx event inside component', event);
     const { command, data } = event.data;
@@ -90,6 +101,11 @@ const DBViewer = () => {
     }
     if (command === 'DISPLAY_QUERY_RESULTS') {
       setTableInfo({ ...data });
+    }
+    if (command === 'LOAD_SCHEMA') {
+      console.log(data);
+      setDBSchema({ ...data.schema });
+      setShowERDiagram(true);
     }
   };
 
@@ -107,9 +123,10 @@ const DBViewer = () => {
       </aside>
       <main>
         <div className="table-actions">
-          <button>DB ER Diagram</button>
+          <button onClick={handleToggleSchema}>{showERDiagram ? 'Hide' : 'View'} DB ER Diagram</button>
         </div>
-        {tableInfo ? (
+        {showERDiagram && dbSchema ? <ERDiagram schema={dbSchema} /> : null}
+        {!showERDiagram && tableInfo ? (
           <>
             <div className="table-responsive">
               <table>
