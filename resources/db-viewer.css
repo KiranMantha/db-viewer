@@ -84,3 +84,25 @@ body #app aside > ul > li > ul > li {
 .table-responsive table {
   width: max-content;
 }
+.diagram-container {
+  background-color: #f9f9f9;
+  padding: 20px;
+  text-align: center;
+  height: 600px;
+  max-height: 100%;
+  overflow: auto;
+  position: relative;
+}
+.diagram-container > div {
+  height: 100%;
+}
+.diagram-container .download {
+  position: sticky;
+  top: 0px;
+  float: right;
+  border-radius: 4px;
+  outline: 1px solid #ccc;
+  background-color: #fff;
+  width: auto;
+  padding: 2px;
+}

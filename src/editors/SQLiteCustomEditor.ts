@@ -77,6 +77,9 @@ export class SQLiteCustomEditorProvider implements vscode.CustomReadonlyEditorPr
         this._parseSchemaFromSQL();
         break;
       }
+      case 'DOWNLOAD_ER_DIAGRAM': {
+        this._downloadERDiagram(args.source);
+      }
     }
   }
 
@@ -205,5 +208,20 @@ export class SQLiteCustomEditorProvider implements vscode.CustomReadonlyEditorPr
 
     // Post the schema to the webview (or other UI component)
     this._panel?.webview.postMessage({ command: 'LOAD_SCHEMA', data: { schema } });
+  }
+
+  private async _downloadERDiagram(source: string) {
+    const uri = await vscode.window.showSaveDialog({
+      filters: { SVG: ['svg'] },
+      saveLabel: 'Save Diagram',
+      title: 'Save ER Diagram'
+    });
+    if (uri) {
+      const encodedSource = new TextEncoder().encode(source);
+      await vscode.workspace.fs.writeFile(uri, encodedSource);
+      vscode.window.showInformationMessage('SVG file saved successfully.');
+    } else {
+      vscode.window.showWarningMessage('Save operation canceled.');
+    }
   }
 }
