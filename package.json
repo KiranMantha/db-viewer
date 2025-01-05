@@ -1,12 +1,19 @@
 {
   "name": "db-viewer-vscode-file",
   "displayName": "DB Viewer",
-  "description": "test",
+  "description": "A vscode extension to view, update and download ER diagram of sqlite database",
   "publisher": "Kiran Mantha",
   "version": "1.0.0",
   "engines": {
     "vscode": "^1.96.0"
   },
+  "keywords": [
+    "database explorer",
+    "db explorer",
+    "sqlite",
+    "explorer",
+    "db viewer"
+  ],
   "categories": [
     "Other"
   ],
