@@ -1,5 +1,5 @@
 {
-  "name": "db-viewer-vscode-file",
+  "name": "db-viewer-sqlite",
   "displayName": "DB Viewer",
   "description": "A vscode extension to view, update and download ER diagram of sqlite database",
   "publisher": "Kiran Mantha",
